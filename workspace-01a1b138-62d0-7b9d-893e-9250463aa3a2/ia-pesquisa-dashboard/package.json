@@ -1,0 +1,9 @@
+{
+  "name": "ia-pesquisa-dashboard",
+  "version": "1.0.0",
+  "description": "Dashboard analítico em tempo real e formulário integrado — IA: Aprendizado ou Cópia?",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  }
+}

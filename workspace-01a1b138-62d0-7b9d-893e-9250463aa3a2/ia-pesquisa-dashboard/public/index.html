@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IA: Aprendizado ou Cópia? — Dashboard Analítico & Formulário</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <!-- Top Navigation Header -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand-group">
+        <div class="brand-logo" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 3v18h18"/>
+            <rect x="7" y="10" width="3" height="7" rx="1"/>
+            <rect x="12" y="6" width="3" height="11" rx="1"/>
+            <rect x="17" y="13" width="3" height="4" rx="1"/>
+          </svg>
+        </div>
+        <div class="brand-titles">
+          <div class="brand-title-row">
+            <h1>IA: Aprendizado ou Cópia?</h1>
+            <span id="liveStatusBadge" class="live-badge is-connecting" title="Status de sincronização em tempo real">
+              <span class="live-dot"></span>
+              <span id="liveStatusText">Conectando...</span>
+            </span>
+          </div>
+          <p class="brand-subtitle">Pesquisa Escolar • Painel Analítico das 8 Questões em Tempo Real</p>
+        </div>
+      </div>
+
+      <nav class="main-tabs" role="tablist" aria-label="Visualizações do site">
+        <button type="button" class="tab-btn active" data-view="dashboard" role="tab" aria-selected="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+          <span>Dashboard</span>
+        </button>
+        <button type="button" class="tab-btn" data-view="table" role="tab" aria-selected="false">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+          <span>Respostas</span>
+          <span id="navCountBadge" class="tab-count">0</span>
+        </button>
+        <button type="button" class="tab-btn tab-btn-form" data-view="form" role="tab" aria-selected="false">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          <span>Responder<span class="hide-xs"> Formulário</span></span>
+        </button>
+      </nav>
+
+      <div class="topbar-actions">
+        <div class="dataset-switcher" role="group" aria-label="Fonte dos dados exibidos">
+          <button type="button" id="btnRealData" class="ds-btn active" title="Exibir respostas reais coletadas ou importadas">
+            Reais <span id="realCountPill" class="ds-pill">0</span>
+          </button>
+          <button type="button" id="btnDemoData" class="ds-btn" title="Pré-visualizar painel com amostra simulada de 20 respostas">
+            Simulação <span class="ds-pill">20</span>
+          </button>
+        </div>
+
+        <button type="button" id="btnOpenImport" class="icon-action-btn" title="Importar CSV ou Planilha Google">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <span class="hide-sm">Importar</span>
+        </button>
+
+        <button type="button" id="btnThemeToggle" class="icon-only-btn" title="Alternar tema claro/escuro" aria-label="Alternar tema claro/escuro">
+          <svg id="iconMoon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          <svg id="iconSun" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="hidden"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Demo Mode Notice Banner -->
+  <div id="demoBanner" class="demo-banner hidden">
+    <div class="container demo-banner-inner">
+      <div class="demo-banner-text">
+        <span class="demo-tag">MODO SIMULAÇÃO</span>
+        <span>Você está visualizando uma amostra ilustrativa de 20 respostas para testar gráficos e filtros. As respostas reais ficam separadas e intactas.</span>
+      </div>
+      <div class="demo-banner-actions">
+        <button type="button" id="btnExitDemoToForm" class="btn-xs btn-xs-light">Responder Pesquisa Real</button>
+        <button type="button" id="btnExitDemo" class="btn-xs btn-xs-outline">Voltar aos Dados Reais</button>
+      </div>
+    </div>
+  </div>
+
+  <main class="container main-content">
+    <!-- ==========================================
+         VIEW 1: DASHBOARD ANALÍTICO
+         ========================================== -->
+    <section id="viewDashboard" class="view-section">
+      <!-- Official Form Information Card -->
+      <div class="form-meta-card" id="formMetaCard">
+        <div class="form-meta-header">
+          <div class="form-meta-title-wrap">
+            <span class="meta-eyebrow">INFORMAÇÕES OFICIAIS DO FORMULÁRIO</span>
+            <h2 class="form-meta-title">“IA aprendizado ou copia?”</h2>
+          </div>
+          <div class="form-meta-controls">
+            <button type="button" id="btnCopyFormLink" class="btn-secondary btn-sm" title="Copiar link direto para a aba de responder neste site">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span>Copiar Link p/ Responder</span>
+            </button>
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSffhUqSLIE5s7nkVtpKQ35lQ6fmYU2t2ViTKDQkAx0xxNdbAA/viewform?usp=dialog" target="_blank" rel="noopener noreferrer" class="btn-secondary btn-sm">
+              <span>Google Forms Original</span>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+            <button type="button" id="btnToggleMeta" class="icon-only-btn btn-sm" title="Recolher/Expandir descrição do formulário" aria-expanded="true">
+              <svg id="chevronMeta" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div id="formMetaBody" class="form-meta-body">
+          <div class="form-meta-descriptions">
+            <p>Esta pesquisa tem como objetivo investigar se o uso da inteligência artificial em atividades escolares pode dificultar a resolução de questões sozinho.</p>
+            <p>Sua participação é voluntária e totalmente anônima, sem coleta de nomes ou dados pessoais.</p>
+            <p>Queremos verificar se nossa hipótese está correta ou não, a partir das respostas dos participantes.</p>
+          </div>
+          <div class="form-meta-pills">
+            <span class="meta-pill"><strong>8</strong> Perguntas estruturadas</span>
+            <span class="meta-pill"><strong>6</strong> Obrigatórias • <strong>2</strong> Opcionais</span>
+            <span class="meta-pill">Formato: <strong>Caixas de seleção</strong></span>
+            <span class="meta-pill">Coleta: <strong>100% Anônima</strong></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty Real Responses Callout -->
+      <div id="emptyRealCallout" class="empty-callout hidden">
+        <div class="empty-callout-info">
+          <div class="empty-callout-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+          </div>
+          <div>
+            <h3>Pronto para receber respostas em tempo real</h3>
+            <p>Ainda não há respostas reais salvas neste painel. Responda diretamente pelo formulário integrado (atualização instantânea), importe um CSV/Planilha Google ou visualize a simulação de exemplo.</p>
+          </div>
+        </div>
+        <div class="empty-callout-btns">
+          <button type="button" class="btn-primary" data-goto-view="form">
+            + Responder Formulário Agora
+          </button>
+          <button type="button" id="btnEmptyImport" class="btn-secondary">
+            Importar CSV / Planilha
+          </button>
+          <button type="button" id="btnEmptyDemo" class="btn-ghost">
+            Testar com Simulação (20)
+          </button>
+        </div>
+      </div>
+
+      <!-- KPI Summary Strip -->
+      <div class="kpi-grid" id="kpiGrid">
+        <!-- Populated dynamically by app.js -->
+      </div>
+
+      <!-- Dynamic Filters & Global Chart Controls -->
+      <div class="filter-bar-card">
+        <div class="filter-controls-row">
+          <div class="filter-group-label">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+            <span>Filtros Dinâmicos:</span>
+          </div>
+
+          <div class="filter-selects">
+            <div class="select-wrap">
+              <label for="filterQ1">1. Série</label>
+              <select id="filterQ1" data-filter-q="q1">
+                <option value="">Todas as séries</option>
+              </select>
+            </div>
+            <div class="select-wrap">
+              <label for="filterQ2">2. Uso de IA</label>
+              <select id="filterQ2" data-filter-q="q2">
+                <option value="">Todos os perfis</option>
+              </select>
+            </div>
+            <div class="select-wrap">
+              <label for="filterQ3">3. Finalidade</label>
+              <select id="filterQ3" data-filter-q="q3">
+                <option value="">Todas as finalidades</option>
+              </select>
+            </div>
+            <div class="select-wrap">
+              <label for="filterQ4">4. 1º Passo</label>
+              <select id="filterQ4" data-filter-q="q4">
+                <option value="">Todas as posturas</option>
+              </select>
+            </div>
+            <div class="select-wrap">
+              <label for="filterQ6">6. Dificuldade s/ IA</label>
+              <select id="filterQ6" data-filter-q="q6">
+                <option value="">Todos os níveis</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="chart-mode-group" role="group" aria-label="Tipo de gráfico global">
+            <button type="button" class="chart-mode-btn active" data-chart-mode="bars" title="Gráfico de barras horizontais">
+              Barras
+            </button>
+            <button type="button" class="chart-mode-btn" data-chart-mode="donut" title="Gráfico de rosca proporcional">
+              Rosca
+            </button>
+            <button type="button" class="chart-mode-btn" data-chart-mode="byGrade" title="Comparativo empilhado por série (1º, 2º, 3º Ano)">
+              Por Série
+            </button>
+          </div>
+        </div>
+
+        <div id="activeFiltersRow" class="active-filters-row hidden">
+          <span class="active-filters-caption">Filtros ativos (clique em qualquer barra/fatia para filtrar):</span>
+          <div id="activeFilterChips" class="active-filter-chips"></div>
+          <button type="button" id="btnClearFilters" class="btn-link-danger">Limpar filtros</button>
+        </div>
+      </div>
+
+      <!-- All 8 Questions Interactive Charts Grid -->
+      <div class="section-heading-row">
+        <div>
+          <h2 class="section-heading">Resultados por Pergunta (1 a 8)</h2>
+          <p class="section-subheading">Clique em qualquer opção nos gráficos para cruzar os dados dinamicamente em todo o painel.</p>
+        </div>
+        <span id="filteredSummaryLabel" class="filtered-summary-pill">Exibindo 0 respostas</span>
+      </div>
+
+      <div id="questionsGrid" class="questions-grid">
+        <!-- Rendered dynamically for Q1..Q8 -->
+      </div>
+
+      <!-- Hypothesis Cross-Tabulation Card -->
+      <div class="hypothesis-card" id="hypothesisCard">
+        <!-- Rendered dynamically from Q3/Q4 vs Q6/Q7/Q8 -->
+      </div>
+
+      <!-- Embedded Preview of Complete Responses Table at Bottom of Dashboard -->
+      <div class="dashboard-table-preview">
+        <div class="section-heading-row">
+          <div>
+            <h2 class="section-heading">Tabela de Respostas Registradas</h2>
+            <p class="section-subheading">Visão individual de todas as respostas filtradas nas 8 perguntas do formulário.</p>
+          </div>
+          <div class="table-quick-actions">
+            <button type="button" class="btn-secondary btn-sm" id="btnExportCsvDash">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span>Exportar CSV</span>
+            </button>
+            <button type="button" class="btn-primary btn-sm" data-goto-view="form">
+              + Adicionar Resposta
+            </button>
+          </div>
+        </div>
+        <div id="dashboardTableMount"></div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         VIEW 2: TABELA COMPLETA DE RESPOSTAS
+         ========================================== -->
+    <section id="viewTable" class="view-section hidden">
+      <div class="section-heading-row">
+        <div>
+          <h2 class="section-heading">Base Completa de Respostas</h2>
+          <p class="section-subheading">Consulte, filtre, pesquise, exporte ou gerencie cada participação registrada no formulário.</p>
+        </div>
+        <div class="table-quick-actions">
+          <button type="button" class="btn-secondary btn-sm" id="btnOpenImportFromTable">
+            Importar CSV / Planilha
+          </button>
+          <button type="button" class="btn-secondary btn-sm" id="btnExportCsvTable">
+            Exportar CSV (.csv)
+          </button>
+          <button type="button" class="btn-danger-outline btn-sm" id="btnClearAllResponses">
+            Limpar Respostas Reais
+          </button>
+        </div>
+      </div>
+
+      <div id="dedicatedTableMount"></div>
+    </section>
+
+    <!-- ==========================================
+         VIEW 3: FORMULÁRIO INTEGRADO (8 QUESTÕES)
+         ========================================== -->
+    <section id="viewForm" class="view-section hidden">
+      <div class="survey-container">
+        <div class="survey-header-card">
+          <div class="survey-top-accent"></div>
+          <div class="survey-header-content">
+            <div class="survey-badges">
+              <span class="survey-badge-anon">Participação Anônima</span>
+              <span class="survey-badge-live">Atualiza o Dashboard na Hora</span>
+            </div>
+            <h2 class="survey-title">IA aprendizado ou copia?</h2>
+            <div class="survey-desc">
+              <p>Esta pesquisa tem como objetivo investigar se o uso da inteligência artificial em atividades escolares pode dificultar a resolução de questões sozinho.</p>
+              <p>Sua participação é voluntária e totalmente anônima, sem coleta de nomes ou dados pessoais.</p>
+              <p>Queremos verificar se nossa hipótese está correta ou não, a partir das respostas dos participantes.</p>
+            </div>
+            <div class="survey-progress-row">
+              <span class="req-legend">* Indica pergunta obrigatória (6 obrigatórias, 2 opcionais)</span>
+              <span id="formProgressText" class="survey-progress-pill">0 de 6 obrigatórias respondidas</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Success Confirmation State -->
+        <div id="surveySuccessCard" class="survey-success-card hidden">
+          <div class="success-icon-circle">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <h3>Resposta registrada com sucesso!</h3>
+          <p id="surveySuccessDetail">Sua participação anônima já foi contabilizada em tempo real nos gráficos e na tabela do dashboard.</p>
+          <div class="success-actions">
+            <button type="button" id="btnGoDashboardAfterSubmit" class="btn-primary">
+              Ver Gráficos Atualizados no Dashboard
+            </button>
+            <button type="button" id="btnSubmitAnother" class="btn-secondary">
+              Enviar Outra Resposta
+            </button>
+          </div>
+        </div>
+
+        <!-- Interactive 8-Question Form -->
+        <form id="integratedSurveyForm" novalidate>
+          <div id="surveyQuestionsMount" class="survey-questions-list">
+            <!-- Rendered dynamically from FORM_SCHEMA -->
+          </div>
+
+          <div class="survey-submit-card">
+            <label class="sync-toggle-row" for="chkSyncGoogleForms">
+              <input type="checkbox" id="chkSyncGoogleForms" checked />
+              <div class="sync-toggle-text">
+                <strong>Enviar cópia também para o Google Forms original</strong>
+                <span>Além de atualizar este dashboard instantaneamente, envia sua resposta ao formulário oficial no Google Forms.</span>
+              </div>
+            </label>
+
+            <div id="formErrorAlert" class="form-error-alert hidden" role="alert"></div>
+
+            <div class="survey-submit-actions">
+              <button type="submit" id="btnSubmitSurvey" class="btn-primary btn-lg">
+                <span>Enviar Resposta</span>
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              </button>
+              <button type="button" id="btnClearSurveyForm" class="btn-ghost">
+                Limpar seleção
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==========================================
+       MODAL: IMPORTAR CSV OU GOOGLE SHEETS
+       ========================================== -->
+  <div id="importModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="importModalTitle">
+    <div class="modal-panel">
+      <div class="modal-header">
+        <h3 id="importModalTitle">Importar Respostas do Google Forms / Sheets</h3>
+        <button type="button" class="icon-only-btn" data-close-modal="importModal" aria-label="Fechar">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="import-section">
+          <h4>Opção 1: Conectar link da Planilha Google (Google Sheets)</h4>
+          <p class="modal-hint">No Google Forms, vá em <strong>Respostas → Ver no Planilhas</strong>, clique em <strong>Compartilhar → Qualquer pessoa com o link (Leitor)</strong> e cole o link abaixo:</p>
+          <div class="sheet-input-row">
+            <input type="url" id="inputSheetUrl" placeholder="https://docs.google.com/spreadsheets/d/..." />
+            <button type="button" id="btnSyncSheet" class="btn-primary">Sincronizar</button>
+          </div>
+        </div>
+
+        <div class="modal-divider"><span>ou</span></div>
+
+        <div class="import-section">
+          <h4>Opção 2: Enviar arquivo CSV exportado do Google Forms</h4>
+          <p class="modal-hint">No Google Forms, clique em <strong>Respostas → ⋮ → Fazer o download das respostas (.csv)</strong> e selecione o arquivo:</p>
+          <label class="file-dropzone" for="inputCsvFile">
+            <input type="file" id="inputCsvFile" accept=".csv,text/csv" />
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span id="csvFileName">Clique para escolher um arquivo <strong>.csv</strong></span>
+          </label>
+        </div>
+
+        <div class="import-mode-row">
+          <label><input type="radio" name="importMode" value="append" checked /> Somar às respostas atuais</label>
+          <label><input type="radio" name="importMode" value="replace" /> Substituir respostas atuais</label>
+        </div>
+
+        <div id="importStatusMsg" class="import-status hidden"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODAL: DETALHES DE UMA RESPOSTA INDIVIDUAL
+       ========================================== -->
+  <div id="detailModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="detailModalTitle">
+    <div class="modal-panel modal-panel-lg">
+      <div class="modal-header">
+        <h3 id="detailModalTitle">Detalhes da Participação</h3>
+        <button type="button" class="icon-only-btn" data-close-modal="detailModal" aria-label="Fechar">✕</button>
+      </div>
+      <div id="detailModalBody" class="modal-body"></div>
+      <div class="modal-footer">
+        <button type="button" id="btnDeleteSingleResponse" class="btn-danger-outline btn-sm">Excluir esta resposta</button>
+        <button type="button" class="btn-secondary btn-sm" data-close-modal="detailModal">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <script src="/formSchema.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>
